@@ -1,11 +1,11 @@
 <?php return array(
     'root' => array(
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => NULL,
+        'reference' => '27567e64758b08c14af5e601451d2219d45267bc',
         'name' => 'freescout/churchtoolsauth',
         'dev' => true,
     ),
@@ -18,7 +18,7 @@
             'aliases' => array(
                 0 => '9999999-dev',
             ),
-            'reference' => '8578a1ab922565f6ac9745b9f9675328eff999fe',
+            'reference' => '0a62fa1be26ee3a5e99fc1a1af2a1eaf8dbaf7e5',
             'dev_requirement' => false,
         ),
         'doctrine/cache' => array(
@@ -31,12 +31,12 @@
             'dev_requirement' => false,
         ),
         'freescout/churchtoolsauth' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => NULL,
+            'reference' => '27567e64758b08c14af5e601451d2219d45267bc',
             'dev_requirement' => false,
         ),
         'guzzlehttp/guzzle' => array(
@@ -76,12 +76,12 @@
             'dev_requirement' => false,
         ),
         'psr/http-client' => array(
-            'pretty_version' => '1.0.2',
-            'version' => '1.0.2.0',
+            'pretty_version' => '1.0.3',
+            'version' => '1.0.3.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../psr/http-client',
             'aliases' => array(),
-            'reference' => '0955afe48220520692d2d09f7ab7e0f93ffd6a31',
+            'reference' => 'bb5906edc1c324c9a05aa0873d40117941e5fa90',
             'dev_requirement' => false,
         ),
         'psr/http-client-implementation' => array(
