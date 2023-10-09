@@ -3,7 +3,7 @@
     "alias": "churchtoolsauth",
     "description": "Login to FreeScout with ChurchTools credentials and manage permissions based on group/role memberships.",
     "version": "1.0.0",
-    "detailsUrl": "https://www.churcholution.ch",
+    "detailsUrl": "https://github.com/churcholution/freescout-churchtoolsauth",
     "author": "Churcholution GmbH",
     "authorUrl": "https://www.churcholution.ch",
     "requiredAppVersion": "1.8.49",
