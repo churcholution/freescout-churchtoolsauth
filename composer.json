@@ -1,0 +1,28 @@
+{
+    "name": "freescout/churchtoolsauth",
+    "description": "",
+    "authors": [
+        {
+            "name": "Churcholution GmbH",
+            "email": "info@churcholution.ch"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\ChurchToolsAuth\\Providers\\ChurchToolsAuthServiceProvider"
+            ],
+            "aliases": {
+                
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\ChurchToolsAuth\\": ""
+        }
+    },
+    "require": {
+        "5pm-hdh/churchtools-api": "dev-master"
+    }
+}

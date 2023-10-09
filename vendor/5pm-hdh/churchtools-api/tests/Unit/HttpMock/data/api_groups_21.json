@@ -1,0 +1,66 @@
+{
+    "data": {
+        "id": "21",
+        "guid": "g21",
+        "name": "Sermon Group",
+        "securityLevelForGroup": "High",
+        "roles": [
+            {
+                "id": 21,
+                "groupTypeId": 21,
+                "name": "Admin",
+                "shorty": "Adm",
+                "sortKey": "name",
+                "toDelete": true,
+                "isActive": true,
+                "canReadChat": true,
+                "canWriteChat": true
+            }
+        ],
+        "members": [
+            {
+                "id": 21,
+                "personId": 21,
+                "comment": "Hello World"
+            }
+        ],
+        "information": {
+            "imageUrl": "",
+            "groupHomepageUrl": null,
+            "groupStatusId": 1,
+            "groupTypeId": 2,
+            "dateOfFoundation": "1903-02-12",
+            "endDate": null,
+            "meetingTime": "17:00",
+            "weekday": 0,
+            "groupCategoryId": 3,
+            "ageGroupIds": [
+                1,
+                8
+            ],
+            "targetGroupId": 2,
+            "maxMembers": 200,
+            "note": "Hello World Note",
+            "campusId": null,
+            "chatStatus": "NOT_STARTED",
+            "color": "",
+            "signUpOverrideRoleId": null,
+            "5pm_name": "Worship-Team"
+        },
+        "settings": {
+            "isHidden": false,
+            "isOpenForMembers": true,
+            "allowSpouseRegistration": true,
+            "allowChildRegistration": true,
+            "allowSameEmailRegistration": true,
+            "autoAccept": true,
+            "allowWaitinglist": true,
+            "waitinglistMaxPersons": 21,
+            "automaticMoveUp": true,
+            "isPublic": false,
+            "groupMeeting": [],
+            "qrCodeCheckin": false,
+            "newMember": []
+        }
+    }
+}

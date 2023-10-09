@@ -1,0 +1,40 @@
+{
+  "data": [
+    {
+      "id": 24,
+      "guid": "guid24",
+      "name": "Sunday Service",
+      "description": "Service Description",
+      "startDate": "2021-09-02 20:15:00",
+      "endDate": "2021-09-02 22:00:00",
+      "chatStatus": false
+    },
+    {
+      "id": 25,
+      "guid": "guid25",
+      "name": "Sunday Service",
+      "description": "Service Description",
+      "startDate": "2021-09-08 20:15:00",
+      "endDate": "2021-09-08 22:00:00",
+      "chatStatus": true
+    },
+    {
+      "id": 26,
+      "guid": "guid26",
+      "name": "Sunday Service",
+      "description": "Service Description",
+      "startDate": "2021-09-21 20:15:00",
+      "endDate": "2021-09-21 22:00:00",
+      "chatStatus": false
+    }
+  ],
+  "meta": {
+    "count": 2,
+    "pagination": {
+      "total": 8,
+      "current": 2,
+      "limit": 3,
+      "lastPage": 3
+    }
+  }
+}

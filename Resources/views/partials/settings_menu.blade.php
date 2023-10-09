@@ -1,0 +1,1 @@
+<li @if (Route::is('mailboxes.churchtoolsauth.settings'))class="active"@endif><a href="{{ route('mailboxes.churchtoolsauth.settings', ['id'=>$mailbox->id]) }}"><i class="glyphicon glyphicon-log-in"></i> {{ __('ChurchTools Auth') }}</a></li>
