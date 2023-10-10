@@ -1,7 +1,7 @@
-# FreeScout ChurchTools Auth Module
+# FreeScout Module - ChurchTools Auth
 Login to [FreeScout](https://github.com/freescout-helpdesk/freescout "FreeScout") with [ChurchTools](https://www.church.tools "ChurchTools") credentials and manage permissions based on group/role memberships.
 
-<img src="Public/img/churchtoolsauth-256x256.png" width="192" height="192" style="border-radius: 1em;" />
+<img src="Public/img/churchtoolsauth-256x256@2.png" width="192" height="192" style="border-radius: 1em;" />
 
 ## Screenshots
 
