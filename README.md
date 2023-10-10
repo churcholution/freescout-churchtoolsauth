@@ -25,4 +25,7 @@ Login to [FreeScout](https://github.com/freescout-helpdesk/freescout "FreeScout"
 3. Run `chown -R www-data:www-data .` (or whichever user:group your webserver uses)
 4. Enjoy the update!
 
+## Contributors
+Special thanks to @DumbergerL for developing and providing the awesome [ChurchTools-API Client](https://github.com/5pm-HDH/churchtools-api "ChurchTools-API Client").
+
 © [Churcholution GmbH](https://www.churcholution.ch "Churcholution GmbH") | All rights reserved.
