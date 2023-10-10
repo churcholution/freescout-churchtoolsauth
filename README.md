@@ -20,7 +20,7 @@ Login to [FreeScout](https://github.com/freescout-helpdesk/freescout "FreeScout"
 4. Activate the Module in the FreeScout Manage > Modules menu.
 
 ## Update
-1. Navigate to the Unassigned Count Module folder e.g. `cd /var/www/html/Modules/ChurchToolsAuth`
+1. Navigate to the ChurchToolsAuth folder e.g. `cd /var/www/html/Modules/ChurchToolsAuth`
 2. Run `git pull`
 3. Run `chown -R www-data:www-data .` (or whichever user:group your webserver uses)
 4. Enjoy the update!
