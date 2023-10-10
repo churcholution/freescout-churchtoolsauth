@@ -9,7 +9,7 @@
     "requiredAppVersion": "1.8.49",
     "license": "AGPL-3.0",
     "keywords": [],
-    "img": "/modules/ChurchToolsAuth/img/churchtoolsauth-256x256.png",
+    "img": "https://www.churcholution.ch/wp-content/uploads/2023/10/churchtoolsauth-256x256@2x.png",
     "active": 0,
     "order": 0,
     "providers": [
