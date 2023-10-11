@@ -39,5 +39,6 @@
     "Enter more characters to search": "Zum Suchen mehr Zeichen eingeben",
     "Searching": "Suche",
     "No results found": "Keine Übereinstimmungen gefunden",
-    "Select group(s)": "Gruppe(n) auswählen"
+    "Select group(s)": "Gruppe(n) auswählen",
+    "Please note that the (initial) synchronization may take some time, depending on the number of people/groups. If the synchronization is performed manually here, this can lead to an error if the values for the timeout are set too low (web server/PHP). In this case wait for the automatic synchronization, which is executed by the cron job. Details can be found in the log.": "Bitte beachte, dass die (erstmalige) Synchronisierung etwas Zeit in Anspruch nehmen kann, abhängig von der Anzahl Personen/Gruppen. Wird die Synchronisierung hier manuell ausgeführt, kann dies zu einem Fehler führen, falls die Werte für den Timeout zu niedrig gesetzt sind (Webserver/PHP). Warte in diesem Fall die automatische Synchronisierung ab, welche durch den Cron-Job ausgeführt wird. Details findest du im Log. "
 }
