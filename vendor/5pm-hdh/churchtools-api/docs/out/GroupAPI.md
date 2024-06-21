@@ -513,3 +513,103 @@
 
 
 ```
+
+## Group-Types
+
+```php
+        use CTApi\Models\Groups\GroupType\GroupType;
+        use CTApi\Models\Groups\GroupType\GroupTypeRequest;
+
+        $groupTypes = GroupTypeRequest::all();
+
+        $groupTypeNames = array_map(function (GroupType $groupType) {
+            return $groupType->getName();
+        }, $groupTypes);
+
+        $groupTypeNameList = implode("/", $groupTypeNames);
+        var_dump( $groupTypeNameList);
+        // Output: "Dienst/Kleingruppe/Maßnahme/Merkmal"
+
+
+```
+
+```php
+        use CTApi\Models\Groups\GroupType\GroupType;
+        use CTApi\Models\Groups\GroupType\GroupTypeRequest;
+
+        $groupType = GroupTypeRequest::find(2);
+
+        var_dump( $groupType?->getName());
+        // Output: "Dienst"
+
+        var_dump( $groupType?->getNameTranslated());
+        // Output: "Dienst"
+
+        var_dump( $groupType?->getNamePlural());
+        // Output: "Dienste"
+
+        var_dump( $groupType?->getNamePluralTranslated());
+        // Output: "Dienste"
+
+        var_dump( $groupType?->getShorty());
+        // Output: "DT"
+
+        var_dump( $groupType?->getDescription());
+        // Output: ""
+
+        var_dump( $groupType?->getIsLeaderNecessary());
+        // Output: false
+
+        var_dump( $groupType?->getAvailableForNewPerson());
+        // Output: false
+
+        var_dump( $groupType?->getPermissionDepth());
+        // Output: 1
+
+        var_dump( $groupType?->getSortKey());
+        // Output: 0
+
+
+```
+
+## Group Roles
+
+```php
+        use CTApi\Models\Groups\GroupTypeRole\GroupTypeRoleRequest;
+
+        $roles = GroupTypeRoleRequest::all();
+        $role = $roles[0];
+
+        var_dump( $role->getId());
+        // Output: 15
+
+        var_dump( $role->getGroupTypeId());
+        // Output: 2
+
+        $groupType = $role->requestGroupType();
+        var_dump( $role->getGrowPathId());
+        // Output: null
+
+        var_dump( $role->getName());
+        // Output: "Mitarbeiter"
+
+        var_dump( $role->getShorty());
+        // Output: "MA"
+
+        var_dump( $role->getType());
+        // Output: "participant"
+
+        var_dump( $role->getIsDefault());
+        // Output: true
+
+        var_dump( $role->getIsHidden());
+        // Output: false
+
+        var_dump( $role->getIsLeader());
+        // Output: false
+
+        var_dump( $role->getSortKey());
+        // Output: 0
+
+
+```

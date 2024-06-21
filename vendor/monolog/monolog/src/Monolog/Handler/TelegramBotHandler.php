@@ -17,14 +17,18 @@ use Monolog\Utils;
 use Monolog\LogRecord;
 
 /**
- * Handler send logs to Telegram using Telegram Bot API.
+ * Handler sends logs to Telegram using Telegram Bot API.
  *
  * How to use:
- *  1) Create telegram bot with https://telegram.me/BotFather
- *  2) Create a telegram channel where logs will be recorded.
- *  3) Add created bot from step 1 to the created channel from step 2.
+ *  1) Create a Telegram bot with https://telegram.me/BotFather;
+ *  2) Create a Telegram channel or a group where logs will be recorded;
+ *  3) Add the created bot from step 1 to the created channel/group from step 2.
  *
- * Use telegram bot API key from step 1 and channel name with '@' prefix from step 2 to create instance of TelegramBotHandler
+ * In order to create an instance of TelegramBotHandler use
+ *  1. The Telegram bot API key from step 1
+ *  2. The channel name with the `@` prefix if you created a public channel (e.g. `@my_public_channel`),
+ *     or the channel ID with the `-100` prefix if you created a private channel (e.g. `-1001234567890`),
+ *     or the group ID from step 2 (e.g. `-1234567890`).
  *
  * @link https://core.telegram.org/bots/api
  *
@@ -107,9 +111,9 @@ class TelegramBotHandler extends AbstractProcessingHandler
         string $channel,
         $level = Level::Debug,
         bool   $bubble = true,
-        string $parseMode = null,
-        bool   $disableWebPagePreview = null,
-        bool   $disableNotification = null,
+        ?string $parseMode = null,
+        ?bool   $disableWebPagePreview = null,
+        ?bool   $disableNotification = null,
         bool   $splitLongMessages = false,
         bool   $delayBetweenMessages = false,
         int    $topic = null
@@ -130,7 +134,10 @@ class TelegramBotHandler extends AbstractProcessingHandler
         $this->setTopic($topic);
     }
 
-    public function setParseMode(string $parseMode = null): self
+    /**
+     * @return $this
+     */
+    public function setParseMode(string|null $parseMode = null): self
     {
         if ($parseMode !== null && !in_array($parseMode, self::AVAILABLE_PARSE_MODES, true)) {
             throw new \InvalidArgumentException('Unknown parseMode, use one of these: ' . implode(', ', self::AVAILABLE_PARSE_MODES) . '.');
@@ -141,14 +148,20 @@ class TelegramBotHandler extends AbstractProcessingHandler
         return $this;
     }
 
-    public function disableWebPagePreview(bool $disableWebPagePreview = null): self
+    /**
+     * @return $this
+     */
+    public function disableWebPagePreview(bool|null $disableWebPagePreview = null): self
     {
         $this->disableWebPagePreview = $disableWebPagePreview;
 
         return $this;
     }
 
-    public function disableNotification(bool $disableNotification = null): self
+    /**
+     * @return $this
+     */
+    public function disableNotification(bool|null $disableNotification = null): self
     {
         $this->disableNotification = $disableNotification;
 
@@ -158,6 +171,7 @@ class TelegramBotHandler extends AbstractProcessingHandler
     /**
      * True - split a message longer than MAX_MESSAGE_LENGTH into parts and send in multiple messages.
      * False - truncates a message that is too long.
+     *
      * @return $this
      */
     public function splitLongMessages(bool $splitLongMessages = false): self
@@ -169,6 +183,7 @@ class TelegramBotHandler extends AbstractProcessingHandler
 
     /**
      * Adds 1-second delay between sending a split message (according to Telegram API to avoid 429 Too Many Requests).
+     *
      * @return $this
      */
     public function delayBetweenMessages(bool $delayBetweenMessages = false): self
@@ -178,6 +193,9 @@ class TelegramBotHandler extends AbstractProcessingHandler
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setTopic(int $topic = null): self
     {
         $this->topic = $topic;

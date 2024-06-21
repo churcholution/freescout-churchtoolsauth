@@ -67,7 +67,6 @@
             <button type="submit" class="btn btn-default" id="churchtoolsauth_sync" data-loading-text="{{ __('Syncing') }}…">
                 {{ __('Execute synchronization') }}
             </button>
-            <p class="help-block">{{ __('Please note that the (initial) synchronization may take some time, depending on the number of people/groups. If the synchronization is performed manually here, this can lead to an error if the values for the timeout are set too low (web server/PHP). In this case wait for the automatic synchronization, which is executed by the cron job. Details can be found in the log.') }}</p>
         </div>
     </div>
     

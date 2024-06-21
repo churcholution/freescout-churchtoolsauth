@@ -1,8 +1,6 @@
 <?php
 
-
 namespace CTApi\Test\Integration\Requests;
-
 
 use CTApi\CTLog;
 use CTApi\Models\Common\Tag\Tag;
@@ -27,7 +25,6 @@ class SongTagRequestTest extends TestCaseAuthenticated
         $this->anyTagName = IntegrationTestData::getResult("get_song_tags", "any_tag.name");
         $this->anotherTagId = IntegrationTestData::getResultAsInt("get_song_tags", "another_tag.id");
         $this->anotherTagName = IntegrationTestData::getResult("get_song_tags", "another_tag.name");
-        CTLog::enableHttpLog();
     }
 
     public function testSongTagAll()

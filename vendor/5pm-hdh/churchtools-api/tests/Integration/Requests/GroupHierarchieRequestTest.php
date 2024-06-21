@@ -1,17 +1,16 @@
 <?php
 
-
 namespace CTApi\Test\Integration\Requests;
 
-
+use CTApi\CTConfig;
+use CTApi\CTLog;
+use CTApi\Models\Common\Auth\AuthRequest;
 use CTApi\Models\Groups\Group\GroupRequest;
 use CTApi\Test\Integration\IntegrationTestData;
 use CTApi\Test\Integration\TestCaseAuthenticated;
 
-
 class GroupHierarchieRequestTest extends TestCaseAuthenticated
 {
-
     private $groupId = "";
     private $groupName = "";
     private $groupParentId = "";
@@ -68,9 +67,7 @@ class GroupHierarchieRequestTest extends TestCaseAuthenticated
                 $foundChild = $child;
             }
         }
-
         $this->assertNotNull($foundChild);
         $this->assertEquals($this->groupChildName, $foundChild->getName());
     }
-
 }

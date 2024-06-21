@@ -17,3 +17,13 @@
 ## GroupMemberFields
 
 {{ \CTApi\Test\Unit\Docs\GroupMemberFieldsTest.testGetFields }}
+
+## Group-Types
+
+{{ \CTApi\Test\Unit\Docs\GroupTypeRequestTest.testGetAll }}
+
+{{ \CTApi\Test\Unit\Docs\GroupTypeRequestTest.testFind }}
+
+## Group Roles
+
+{{ \CTApi\Test\Unit\Docs\GroupTypeRoleRequestTest.testGetGroupTypeRoleRequest }}

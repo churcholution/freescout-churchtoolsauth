@@ -1,8 +1,6 @@
 <?php
 
-
 namespace CTApi\Models\Common\DBField;
-
 
 use CTApi\Models\AbstractModel;
 use CTApi\Traits\Model\FillWithData;
@@ -12,6 +10,8 @@ class DBField extends AbstractModel
     use FillWithData;
 
     protected ?string $name = null;
+    protected ?string $key = null;
+    protected ?string $useAsPlaceholder = null;
     protected ?string $nameTranslated = null;
     protected ?string $shorty = null;
     protected ?string $column = null;
@@ -409,6 +409,28 @@ class DBField extends AbstractModel
     public function setOptions(array $options): DBField
     {
         $this->options = $options;
+        return $this;
+    }
+
+    public function getKey(): ?string
+    {
+        return $this->key;
+    }
+
+    public function setKey(?string $key): DBField
+    {
+        $this->key = $key;
+        return $this;
+    }
+
+    public function getUseAsPlaceholder(): ?string
+    {
+        return $this->useAsPlaceholder;
+    }
+
+    public function setUseAsPlaceholder(?string $useAsPlaceholder): DBField
+    {
+        $this->useAsPlaceholder = $useAsPlaceholder;
         return $this;
     }
 }

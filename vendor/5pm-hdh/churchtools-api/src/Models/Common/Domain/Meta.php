@@ -1,8 +1,6 @@
 <?php
 
-
 namespace CTApi\Models\Common\Domain;
-
 
 use CTApi\Models\Groups\Person\Person;
 use CTApi\Models\Groups\Person\PersonRequest;
@@ -80,8 +78,8 @@ class Meta
 
     public function requestModifiedPerson(): ?Person
     {
-        if (!is_null($this->getCreatedPerson())) {
-            $id = $this->getModifiedPerson()?->getId();
+        if (!is_null($this->getModifiedPerson())) {
+            $id = $this->getModifiedPerson()->getId();
             return $this->requestPerson($id);
         }
         return null;

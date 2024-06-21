@@ -1,8 +1,6 @@
 <?php
 
-
 namespace CTApi\Traits\Request;
-
 
 use CTApi\Exceptions\CTRequestException;
 
@@ -39,11 +37,11 @@ trait OrderByCondition
                     } else {
                         return (int)($valueB - $valueA);
                     }
-                } else if (is_string($valueA) || is_string($valueB)) {
+                } elseif (is_string($valueA) || is_string($valueB)) {
                     if ($sortAscending) {
-                        return strcmp($valueA, $valueB);
+                        return strcmp($valueA ?? "", $valueB ?? "");
                     } else {
-                        return strcmp($valueB, $valueA);
+                        return strcmp($valueB ?? "", $valueA ?? "");
                     }
                 } else {
                     return 0;

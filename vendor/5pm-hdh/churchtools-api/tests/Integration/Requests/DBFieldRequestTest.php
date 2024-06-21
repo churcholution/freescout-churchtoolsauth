@@ -1,9 +1,9 @@
 <?php
 
-
 namespace CTApi\Test\Integration\Requests;
 
-
+use CTApi\CTConfig;
+use CTApi\CTLog;
 use CTApi\Models\Common\DBField\DBField;
 use CTApi\Models\Common\DBField\DBFieldRequest;
 use CTApi\Models\Common\DBField\DBFieldValueContainer;
@@ -12,9 +12,13 @@ use CTApi\Models\Groups\Person\PersonRequest;
 use CTApi\Test\Integration\IntegrationTestData;
 use CTApi\Test\Integration\TestCaseAuthenticated;
 
-
 class DBFieldRequestTest extends TestCaseAuthenticated
 {
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+    }
+
     public function testRequestAll()
     {
         $dbFields = DBFieldRequest::all();
@@ -118,8 +122,12 @@ class DBFieldRequestTest extends TestCaseAuthenticated
         $groupInformation = $group->getInformation();
         $this->assertNotNull($groupInformation);
 
+        //print_r($groupInformation);
+
         $dbFields = $groupInformation->requestDBFields()->get();
         $this->assertDBFieldStoreOnlyContainsDBFields($dbFields);
+
+        //print_r($dbFields);
 
         $name5pmDBField = null;
         foreach ($dbFields as $dbField) {
