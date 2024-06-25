@@ -13,12 +13,6 @@ use App\Mailbox;
 use App\User;
 use Exception;
 
-use \CTApi\CTConfig;
-use \CTApi\CTSession;
-use \CTApi\Models\Groups\Group\GroupRequest;
-use \CTApi\Models\Groups\Person\PersonRequest;
-use \CTApi\Models\Groups\GroupMember\GroupMemberRequest;
-
 use Modules\ChurchToolsAuth\Helpers\ChurchToolsAuthHelper;
 
 class Sync extends Command
@@ -63,8 +57,10 @@ class Sync extends Command
 
         \Helper::log(CHURCHTOOLSAUTH_LABEL, 'Start synchronization of all users');
 
+        $CT = ChurchToolsAuthHelper::getChurchToolsInstance();
+
         //Connect to ChurchTools
-        if ( ! ChurchToolsAuthHelper::connectChurchToolsDefault(true, true) ) {
+        if ( $CT === null ) {
             \Helper::log(CHURCHTOOLSAUTH_LABEL, 'Cannot connect to ChurchTools');
             \Helper::log(CHURCHTOOLSAUTH_LABEL, 'Cancel synchronization');
             return false;
@@ -130,7 +126,8 @@ class Sync extends Command
                 $person = $data;
                 \Helper::log(CHURCHTOOLSAUTH_LABEL, 'ChurchTools person #' . $personID . ' loaded for syncing');
             } else {
-                if ( ChurchToolsAuthHelper::connectChurchToolsDefault(true, true) ) {
+                $CT = ChurchToolsAuthHelper::getChurchToolsInstance();
+                if ( $CT !== null ) {
                     $person = self::getPersonList($personID);
                     if ( ! empty($person) and is_array($person) ) {
                         $person = $person[0];
@@ -252,7 +249,8 @@ class Sync extends Command
         $personlist = array();
 
         //Connect to ChurchTools
-        if ( ! ChurchToolsAuthHelper::connectChurchToolsDefault() ) {
+        $CT = ChurchToolsAuthHelper::getChurchToolsInstance();
+        if ( $CT === null ) {
             return $personlist;
         }
 
@@ -261,8 +259,8 @@ class Sync extends Command
 
         foreach (Mailbox::all() as $mailbox) {
             $mailboxitem = array('id' => $mailbox->id, 'name' => $mailbox->name, 'groups_roles' => array());
-            if ( array_Key_exists(CHURCHTOOLSAUTH_MODULE, $mailbox->meta) ) {
-                if ( is_array($mailbox->meta) and ! empty($mailbox->meta) ) {
+            if ( ! empty($mailbox->meta) and is_array($mailbox->meta) ) {
+                if ( array_key_exists(CHURCHTOOLSAUTH_MODULE, $mailbox->meta) ) {
                     $meta = $mailbox->meta[CHURCHTOOLSAUTH_MODULE];
                     if ( array_key_exists('groups_roles', $meta) ) {
                         $groups = $meta['groups_roles'];
@@ -299,102 +297,112 @@ class Sync extends Command
             try {
                 
                 try {
-                    $group = GroupRequest::findOrFail($groupID);
+                    $group = $CT->getData('/groups/' . $groupID);
                 } catch ( \Exception $e ) {
                     continue;
                 }
 
-                if ( ! empty($group) ) {
+                if ( ! empty($group) and is_array($group) ) {
 
-                    if ( $group->getInformation()->getGroupStatusId() != 1 ) { //Process only groups with status "active"
+                    $groupStatusId = $group['information']['groupStatusId'] ?? 0;
+
+                    if ( $groupStatusId != 1 ) { //Process only groups with status "active"
                         continue;
                     }
 
-                    $members = $group->requestMembers()->get();
-                    foreach ( $members as $member ) {
+                    $members = $CT->getData('/groups/' . $groupID . '/members');
+                    if ( ! empty($members) and is_array($members) ) {
 
-                        if ( $roleID != 0 and $roleID != intval($member->getGroupTypeRoleId()) ) {
-                            continue;
-                        }
+                        foreach ( $members as $member ) {
 
-                        if ( $member->getGroupMemberStatus() != 'active' ) {
-                            continue;
-                        }
-
-                        $personID = intval($member->getPersonId());
-                        $person = null;
-
-                        if ( ! empty($personFilter) ) {
-
-                            if ( ! is_array($personFilter) ) {
-                                $personFilter = array($personFilter);
-                            }
-
-                            $found = false;
-
-                            foreach ( $personFilter as $filter ) {
-
-                                if ( is_numeric($filter) ) {
-                                    if ( $filter == $personID ) {
-                                        $found = true;
-                                        break;
-                                    }
-                                } elseif ( strpos($filter, '@') ) {
-                                    $person = PersonRequest::find($personID);
-                                    if ( ! empty($person) and $filter == $person->getEmail() ) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-
-                            }
-
-                            if ( ! $found ) {
+                            $groupTypeRoleId = $member['groupTypeRoleId'] ?? 0;
+                            if ( $roleID != 0 and $roleID != intval($groupTypeRoleId) ) {
                                 continue;
                             }
 
-                        }
-
-                        $found = false;
-                        $key = null;
-                        foreach ( $personlist as $personlistKey => $personlistValue ) {
-                            if ( $personlistValue['id'] == $personID ) {
-                                $key = $personlistKey;
-                                $found = true;
-                                break;
+                            $groupMemberStatus = $member['groupMemberStatus'] ?? '';
+                            if ( $groupMemberStatus != 'active' ) {
+                                continue;
                             }
-                        }
 
-                        $membership = array('groupID' => $groupID, 'roleID' => intval($member->getGroupTypeRoleId()));
+                            $personID = intval($member['personId'] ?? 0);
+                            $person = null;
 
-                        if ( ! $found ) {
+                            if ( ! empty($personFilter) ) {
 
-                            if ( empty($person) ) {
-                                $person = PersonRequest::find($personID);
-                                if ( empty($person) ) {
+                                if ( ! is_array($personFilter) ) {
+                                    $personFilter = array($personFilter);
+                                }
+
+                                $found = false;
+
+                                foreach ( $personFilter as $filter ) {
+
+                                    if ( is_numeric($filter) ) {
+                                        if ( $filter == $personID ) {
+                                            $found = true;
+                                            break;
+                                        }
+                                    } elseif ( strpos($filter, '@') ) {
+                                        $person = $CT->getData('/persons/' . $personID);
+                                        if ( ! empty($person) and is_array($person) ) {
+                                            $email = $person['email'] ?? '';
+                                            if ( $filter == $email ) {
+                                                $found = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                }
+
+                                if ( ! $found ) {
                                     continue;
                                 }
+
                             }
-                            
-                            $personitem = $skeleton;
 
-                            $personitem['id'] = $personID;
-                            $personitem['firstname'] = $person->getFirstName();
-                            $personitem['lastname'] = $person->getLastName();
-                            $personitem['email'] = $person->getEmail();
-                            $personitem['avatar'] = $person->getImageUrl();
-                            $personitem['admin'] = self::isPersonAdmin($personID);
+                            $found = false;
+                            $key = null;
+                            foreach ( $personlist as $personlistKey => $personlistValue ) {
+                                if ( $personlistValue['id'] == $personID ) {
+                                    $key = $personlistKey;
+                                    $found = true;
+                                    break;
+                                }
+                            }
 
-                            $personitem['memberships'][] = $membership;
+                            $membership = array('groupID' => $groupID, 'roleID' => intval($groupTypeRoleId));
 
-                            $personlist[] = $personitem;
+                            if ( ! $found ) {
 
-                        } else {
-                            
-                            $personlist[$key]['memberships'][] = $membership;
+                                if ( empty($person) ) {
+                                    $person = $CT->getData('/persons/' . $personID);
+                                    if ( empty($person) or ! is_array($person) ) {
+                                        continue;
+                                    }
+                                }
+                                
+                                $personitem = $skeleton;
+
+                                $personitem['id'] = $personID;
+                                $personitem['firstname'] = $person['firstName'] ?? '';
+                                $personitem['lastname'] = $person['lastName'] ?? '';
+                                $personitem['email'] = $person['email'] ?? '';
+                                $personitem['avatar'] = $person['imageUrl'] ?? '';
+                                $personitem['admin'] = self::isPersonAdmin($personID);
+
+                                $personitem['memberships'][] = $membership;
+
+                                $personlist[] = $personitem;
+
+                            } else {
+                                
+                                $personlist[$key]['memberships'][] = $membership;
+
+                            }
 
                         }
-
                     }
                 }
 
@@ -405,30 +413,37 @@ class Sync extends Command
         }
 
         //Get all admins
-        if ( empty($personFilter) ) {
-            $admins = self::getAdminPersons();
-            foreach ( $admins as $admin ) {
-                $found = false;
-                foreach ( $personlist as $item ) {
-                    if ( $item['id'] == $admin ) {
-                        $found = true;
-                        break;
-                    }
+        $admins = self::getAdminPersons();
+        foreach ( $admins as $admin ) {
+            $found = false;
+            foreach ( $personlist as $item ) {
+                if ( $item['id'] == $admin ) {
+                    $found = true;
+                    break;
                 }
-                if ( ! $found ) {
-                    $person = PersonRequest::find($admin);
-                    if ( empty($person) ) {
+            }
+            if ( ! $found ) {
+                $person = $CT->getData('/persons/' . $admin);
+                if ( empty($person) or ! is_array($person) ) {
+                    continue;
+                }
+                if ( ! empty($personFilter) ) {
+                    if ( ! is_array($personFilter) ) {
+                        $personFilter = array($personFilter);
+                    }
+                    if ( ! in_array($admin, $personFilter) and ! in_array($person['email'] ?? '', $personFilter) ) {
                         continue;
                     }
-                    $personitem = $skeleton;
-                    $personitem['id'] = $admin;
-                    $personitem['firstname'] = $person->getFirstName();
-                    $personitem['lastname'] = $person->getLastName();
-                    $personitem['email'] = $person->getEmail();
-                    $personitem['avatar'] = $person->getImageUrl();
-                    $personitem['admin'] = true;
-                    $personlist[] = $personitem;
                 }
+                
+                $personitem = $skeleton;
+                $personitem['id'] = $admin;
+                $personitem['firstname'] = $person['firstName'] ?? '';
+                $personitem['lastname'] = $person['lastName'] ?? '';
+                $personitem['email'] = $person['email'] ?? '';
+                $personitem['avatar'] = $person['imageUrl'] ?? '';
+                $personitem['admin'] = true;
+                $personlist[] = $personitem;
             }
         }
 

@@ -11,13 +11,7 @@ use GuzzleHttp\Client;
 use App\Mailbox;
 use App\User;
 
-use \CTApi\CTConfig;
-use \CTApi\CTSession;
-use \CTApi\Models\Groups\Group\GroupRequest;
-use \CTApi\Models\Groups\Person\PersonRequest;
-use \CTApi\Models\Groups\GroupMember\GroupMemberRequest;
-use \CTApi\Models\Common\Search\SearchRequest;
-
+use Modules\ChurchToolsAuth\Libraries\ChurchTools\ChurchToolsClient;
 use Modules\ChurchToolsAuth\Helpers\ChurchToolsAuthHelper;
 
 class ChurchToolsAuthController extends Controller
@@ -43,30 +37,20 @@ class ChurchToolsAuthController extends Controller
                 $error = '';
 
                 //Connect to ChurchTools
-                if ( ChurchToolsAuthHelper::connectChurchTools($settings['churchtoolsauth_url'], $settings['churchtoolsauth_logintoken'], uniqid(), true) ) {
+                $CT = New ChurchToolsClient();
+                $CT->setUrl($settings['churchtoolsauth_url']);
+
+                if ( $CT->authWithLoginToken($settings['churchtoolsauth_logintoken']) ) {
 
                     \Option::set('churchtoolsauth_url', $settings['churchtoolsauth_url']);
                     \Option::set('churchtoolsauth_logintoken', encrypt($settings['churchtoolsauth_logintoken']));
 
-                    try {
-                    
-                        $groups = array();
-                        $persons = array();
+                    $whoami = $CT->getData('/whoami');
+                    $whoamiId = $whoami['id'] ?? 0;
+                    $whoamiUsername = $whoami['cmsUserId'] ?? '';
 
-                        if ( ChurchToolsAuthHelper::connectChurchToolsDefault(true, true) ) {
-
-                            $whoami = PersonRequest::whoami();
-
-                            $response['msg_success'] = __('ChurchTools sucessfully connected as: :username (#:id)', ['id' => $whoami->getId(), 'username' => $whoami->getCmsUserId()]);
-                            $response['status'] = 'success';
-
-                        } else {
-                            $response['msg'] = __('ChurchTools connection failed');
-                        }
-
-                    } catch ( \Exception $e ) {
-                        $response['msg'] = $e->getMessage();
-                    }
+                    $response['msg_success'] = __('ChurchTools sucessfully connected as: :username (#:id)', ['id' => $whoamiId, 'username' => $whoamiUsername]);
+                    $response['status'] = 'success';
 
                 } else {
                     $response['msg'] = __('ChurchTools connection failed');
@@ -117,13 +101,17 @@ class ChurchToolsAuthController extends Controller
 
             case 'person':
 
-                if ( ChurchToolsAuthHelper::connectChurchToolsSearch() ) {
+                $CT = ChurchToolsAuthHelper::getChurchToolsInstance();
 
-                    $results = SearchRequest::search($request->q)->whereDomainType('person')->get();
+                if ( $CT !== null ) {
+
+                    $results = $CT->getData('/search', ['domainTypes'=>['person'], 'query' => $request->q]);
 
                     if ( ! empty($results) and is_array($results) ) {
                         foreach ( $results as $result ) {
-                            $response['results'][] = array('id' => $result->getDomainIdentifier(), 'text' => $result->getTitle() . ' (#' . $result->getDomainIdentifier() . ')');
+                            $domainIdentifier = $result['domainIdentifier'] ?? 0;
+                            $title = $result['title'] ?? '';
+                            $response['results'][] = array('id' => $domainIdentifier, 'text' => $title . ' (#' . $domainIdentifier . ')');
                         }
                     }
 
@@ -133,20 +121,28 @@ class ChurchToolsAuthController extends Controller
 
             case 'group_role':
 
-                if ( ChurchToolsAuthHelper::connectChurchToolsSearch() ) {
+                $CT = ChurchToolsAuthHelper::getChurchToolsInstance();
 
-                    $results = SearchRequest::search($request->q)->whereDomainType('group')->get();
+                if ( $CT !== null ) {
+
+                    $results = $CT->getData('/search', ['domainTypes'=>['group'], 'query' => $request->q]);
 
                     if ( ! empty($results) and is_array($results) ) {
                         foreach ( $results as $result ) {
-                            $optgroup = array('text' => $result->getTitle(), 'children' => array(array('id' => $result->getDomainIdentifier() . '_0', 'text' => $result->getTitle() . ' (#' . $result->getDomainIdentifier() . '): ' . __('All roles'))));
-                            $group = GroupRequest::find($result->getDomainIdentifier());
-                            if ( ! empty($group) ) {
-                                foreach ( $group->getRoles() as $role ) {
-                                    $optgroup['children'][] = array('id' => $result->getDomainIdentifier() . '_' . $role->getGroupTypeRoleId(), 'text' => $result->getTitle() . ' (#' . $result->getDomainIdentifier() . '): ' . $role->getName());
+                            $domainIdentifier = $result['domainIdentifier'] ?? 0;
+                            $title = $result['title'] ?? '';
+                            
+                            $optgroup = array('text' => $title, 'children' => array(array('id' => $domainIdentifier . '_0', 'text' => $title . ' (#' . $domainIdentifier . '): ' . __('All roles'))));
+                            $roles = $CT->getData('/groups/' . $domainIdentifier . '/roles');
+                            if ( ! empty($roles) and is_array($roles) ) {
+                                foreach ( $roles as $role ) {
+                                    $groupTypeRoleId = $role['groupTypeRoleId'] ?? 0;
+                                    $name = $role['name'] ?? '';
+                                    $optgroup['children'][] = array('id' => $domainIdentifier . '_' . $groupTypeRoleId, 'text' => $title . ' (#' . $domainIdentifier . '): ' . $name);
                                 }
                                 $response['results'][] = $optgroup;
                             }
+
                         }
                     }
 
@@ -179,7 +175,9 @@ class ChurchToolsAuthController extends Controller
 
         $grouproleslist = array();
 
-        if ( ChurchToolsAuthHelper::connectChurchToolsDefault(true, true) ) {
+        $CT = ChurchToolsAuthHelper::getChurchToolsInstance();
+
+        if ( $CT !== null ) {
 
             if ( ! empty($settings['groups_roles']) and is_array($settings['groups_roles']) ) {
                 foreach ( $settings['groups_roles'] as $group_role ) {
@@ -191,21 +189,27 @@ class ChurchToolsAuthController extends Controller
                     $groupID = intval($item[0]);
                     $roleID = intval($item[1]);
 
-                    $group = GroupRequest::find($groupID);
+                    $group = $CT->getData('/groups/' . $groupID);
+                    $groupName = $group['name'] ?? '';
 
                     $roleName = '';
                     if ( $roleID == 0 ) {
                         $roleName = __('All roles');
                     } else {
-                        foreach ( $group->getRoles() as $role ) {
-                            if ( $role->getGroupTypeRoleId() == $roleID ) {
-                                $roleName = $role->getName();
-                                break;
+                        $roles = $CT->getData('/groups/' . $groupID. '/roles');
+                        if ( ! empty($roles) and is_array($roles) ) {
+                            foreach ( $roles as $role ) {
+                                $groupTypeRoleId = $role['groupTypeRoleId'] ?? 0;
+                                $name = $role['name'] ?? '';
+                                if ( $groupTypeRoleId == $roleID ) {
+                                    $roleName = $name;
+                                    break;
+                                }
                             }
-                        }
+                        } 
                     }
 
-                    $grouproleslist[] = array('id' => $group_role, 'text' => $group->getName() . ' (#' . $groupID . '): ' . $roleName);
+                    $grouproleslist[] = array('id' => $group_role, 'text' => $groupName . ' (#' . $groupID . '): ' . $roleName);
                     
                 }
             }

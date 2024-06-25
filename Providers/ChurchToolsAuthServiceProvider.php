@@ -12,11 +12,9 @@ use App\User;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
-use \CTApi\CTConfig;
-use \CTApi\CTSession;
-use \CTApi\Models\Groups\Person\PersonRequest;
 
 use Modules\ChurchToolsAuth\Http\Controllers\ChurchToolsAuthController;
+use Modules\ChurchToolsAuth\Libraries\ChurchTools\ChurchToolsClient;
 use Modules\ChurchToolsAuth\Helpers\ChurchToolsAuthHelper;
 use Modules\ChurchToolsAuth\Console\Sync;
 
@@ -110,11 +108,16 @@ class ChurchToolsAuthServiceProvider extends ServiceProvider
             $settings['churchtoolsauth_logintoken'] = \Helper::decrypt($settings['churchtoolsauth_logintoken']);
 
             $admins_list = array();
-            if ( ChurchToolsAuthHelper::connectChurchToolsDefault(true, true) ) {
+
+            $CT = ChurchToolsAuthHelper::getChurchToolsInstance();
+            if ( $CT !== null ) {
                 foreach ( $settings['churchtoolsauth_admins'] as $admin ) {
-                    $person = PersonRequest::find($admin);
-                    if ( ! empty($person) ) {
-                        $admins_list[] = array('id' => $person->getId(), 'text' => $person->getFirstName() . ' ' . $person->getLastName() . ' (#' . $person->getId() . ')');
+                    $person = $CT->getData('/persons/' . $admin);
+                    if ( ! empty($person) and is_array($person) ) {
+                        $personId = $person['id'] ?? 0;
+                        $personFirstName = $person['firstName'] ?? '';
+                        $personLastName = $person['lastName'] ?? '';
+                        $admins_list[] = array('id' => $personId, 'text' => $personFirstName . ' ' . $personLastName . ' (#' . $personId . ')');
                     }
                 }
             }
@@ -179,19 +182,13 @@ class ChurchToolsAuthServiceProvider extends ServiceProvider
                 
                 \Helper::log(CHURCHTOOLSAUTH_LABEL, 'User is trying to log in: ' . $credentials['email']);
                 
-                CTSession::switchSession("userlogin"); //Use separate session for login
-                CTConfig::clearCache();
+                $CT = New ChurchToolsClient();
+                $CT->setUrl($url);
 
-                CTConfig::setApiUrl($url);
-                $success = CTConfig::authWithCredentials($credentials['email'], $credentials['password'], $_POST['totp'] ?? '');
-                $isValid = CTConfig::validateAuthentication();
-
-                if ( $isValid ) {
+                if ( $CT->authWithCredentials($credentials['email'], $credentials['password'], $_POST['totp'] ?? '') ) {
                     \Helper::log(CHURCHTOOLSAUTH_LABEL, 'User logged in successfully: ' . $credentials['email']);
-
-                    $personID = intval(PersonRequest::whoami()->getID());
+                    $personID = intval($CT->getUserId());
                     $isValid = Sync::syncUser($personID);
-
                 }
 
             } catch ( \Exception $e ) {
@@ -260,7 +257,7 @@ class ChurchToolsAuthServiceProvider extends ServiceProvider
                 <div class="form-group">
                     <label for="totp" class="col-md-4 control-label"><?php echo __('TOTP'); ?></label>
                     <div class="col-md-6">
-                        <input id="totp" type="text" class="form-control" name="totp" value="">
+                        <input id="totp" type="number" class="form-control" name="totp" value="" inputmode="numeric" autocomplete="one-time-code">
                         <span class="help-block"><?php echo __('Code for two-factor authentication, if required'); ?></span>
                     </div>
                 </div>
