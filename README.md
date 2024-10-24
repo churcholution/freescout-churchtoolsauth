@@ -19,6 +19,8 @@ Login to [FreeScout](https://github.com/freescout-helpdesk/freescout "FreeScout"
 3. Run `chown -R www-data:www-data ChurchToolsAuth` (or whichever user:group your webserver uses)
 4. Activate the Module in the FreeScout Manage > Modules menu.
 
+IMPORTANT: The name of the module folder has to be exactly `ChurchToolsAuth` (case-sensitive).
+
 ## Update
 1. Navigate to the ChurchToolsAuth folder e.g. `cd /var/www/html/Modules/ChurchToolsAuth`
 2. Run `git pull`
