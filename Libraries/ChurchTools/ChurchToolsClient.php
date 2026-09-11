@@ -600,7 +600,7 @@ class ChurchToolsClient
 
     }
 
-    public function authWithLoginToken(string $loginToken) : bool {
+    public function authWithLoginToken(string $loginToken, bool $withSession = true) : bool {
 
         $this->clearCookies();
 
@@ -612,7 +612,12 @@ class ChurchToolsClient
 
         $endpoint = '/whoami';
 
-        $response = $this->get($endpoint, null, null, $options);
+        $queryParams = [];
+        if ( $withSession === true ) {
+            $queryParams['with_session'] = 'true';
+        }
+
+        $response = $this->get($endpoint, $queryParams, null, $options);
 
         if ( $response->getStatusCode() != 200 ) {
             return false;
